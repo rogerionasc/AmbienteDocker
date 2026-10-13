@@ -1,0 +1,73 @@
+networks:
+  network-webclinic:
+    name: network-webclinic
+    driver: bridge
+
+services:
+  db:
+    container_name: postgres
+    image: postgres:15
+    restart: unless-stopped
+    networks:
+      - network-webclinic
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${DATABASE_DATABASE}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    tty: true
+      
+  app:
+    container_name: appWeb
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+      DB_HOST: db
+    entrypoint: >
+      bash -c "
+        if [ ! -f /var/www/html/appWeb/artisan ]; then
+          echo '=== Clonando repositorio WebClinic ===' &&
+          if [ -n \"$$GITHUB_TOKEN\" ] && [ \"$$GITHUB_TOKEN\" != \"seu_token_aqui\" ]; then
+            git clone https://$${GITHUB_TOKEN}@github.com/rogerionasc/WebClinic.git /var/www/html/appWeb;
+          else
+            git clone https://github.com/rogerionasc/WebClinic.git /var/www/html/appWeb;
+          fi
+        fi &&
+        cd /var/www/html/appWeb &&
+        if [ ! -f .env ]; then cp .env.example .env; fi &&
+        if [ ! -f vendor/autoload.php ]; then
+          echo '=== Instalando dependencias do Composer ===' &&
+          composer install --no-interaction --prefer-dist --optimize-autoloader;
+        fi &&
+        if [ ! -f public/build/manifest.json ]; then
+          echo '=== Compilando assets do Vite com Node ===' &&
+          npm install &&
+          npm run build;
+        fi &&
+        php artisan key:generate --force &&
+        echo '=== Criando link simbolico do storage ===' &&
+        php artisan storage:link || true &&
+        echo '=== Configurando permissoes de storage e logs ===' &&
+        touch /var/www/html/appWeb/storage/logs/laravel.log &&
+        chown -R www-data:www-data /var/www/html/appWeb/storage /var/www/html/appWeb/bootstrap/cache &&
+        chmod -R 777 /var/www/html/appWeb/storage /var/www/html/appWeb/bootstrap/cache &&
+        echo '=== Iniciando Servidor Apache ===' &&
+        apache2ctl -D FOREGROUND
+      "
+    networks:
+      - network-webclinic
+    ports:
+      - "80:80"
+      - "8080:80"
+    working_dir: /var/www/html/appWeb
+    volumes:
+      - ./appWeb:/var/www/html/appWeb
+    depends_on:
+      - db
+    tty: true

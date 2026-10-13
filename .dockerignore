@@ -1,0 +1,28 @@
+# Git
+**/.git
+**/.gitignore
+
+# Dependencias (montadas via volume ou instaladas no container)
+**/node_modules
+**/vendor
+
+# Storage e Links Simbolicos
+**/public/storage
+appWeb/public/storage
+**/storage/logs/*
+**/storage/framework/cache/*
+**/storage/framework/sessions/*
+**/storage/framework/views/*
+
+# Banco de dados local do Docker
+db_data/
+db_data
+
+# appWeb
+appWeb
+appWeb/**
+
+# Arquivos temporarios e logs
+*.log
+.idea
+.vscode

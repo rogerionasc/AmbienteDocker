@@ -1,0 +1,20 @@
+# Arquivo de ambiente com senhas e tokens
+.env
+
+# Banco de dados local do Docker
+db_data/
+
+# Codigo da aplicacao WebClinic (repositorio separado)
+appWeb/
+
+# Dependencias
+**/node_modules/
+**/vendor/
+
+# Storage e links simbolicos
+**/public/storage
+
+# Logs e arquivos do sistema / IDE
+*.log
+.idea/
+.vscode/

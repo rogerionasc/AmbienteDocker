@@ -1,0 +1,7 @@
+# Entradas de DNS Local para o ambiente Docker
+# No Ubuntu / Linux, o arquivo e: /etc/hosts
+# No Windows, o arquivo e: C:\Windows\System32\drivers\etc\hosts
+
+127.0.0.1       appweb.local
+127.0.0.1       webclinic.local
+127.0.0.1       matriz.webclinic.local
