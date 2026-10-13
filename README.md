@@ -7,7 +7,7 @@
         <img src="https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
         <img src="https://img.shields.io/badge/PHP-8.1-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP" />
         <img src="https://img.shields.io/badge/Node.js-18.x-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js" />
-        <img src="https://img.shields.io/badge/Laravel-9.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel" />
+        <img src="https://img.shields.io/badge/Laravel-9.x%20%2F%2010.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel" />
         <img src="https://img.shields.io/badge/Ubuntu-22.04-E95420?style=for-the-badge&logo=ubuntu&logoColor=white" alt="Ubuntu" />
     </p>
 </div>
@@ -17,8 +17,9 @@
         <a href="#sobre">Sobre</a> •
         <a href="#arquitetura-do-ambiente">Arquitetura</a> •
         <a href="#pré-requisitos">Pré-requisitos</a> •
-        <a href="#ambientação-e-instalação">Ambientação</a> •
-        <a href="#configuração-de-dns--hosts">Configuração de DNS</a> •
+        <a href="#ambientação-e-instalação">Instalação</a> •
+        <a href="#urls-de-acesso">URLs de Acesso</a> •
+        <a href="#solução-de-problemas-frequentes">Troubleshooting</a> •
         <a href="#comandos-úteis">Comandos Úteis</a> •
         <a href="#licença">Licença</a>
     </p>
@@ -28,9 +29,9 @@
 
 # Sobre
 
-O **WCode Clinic ERP** é uma solução completa de gestão clínica (Enterprise Resource Planning) projetada para otimizar operações médicas, prontuários, agendamentos, faturamento e integrações com convênios.
+Este repositório contém a infraestrutura e o ambiente de desenvolvimento conteinerizado com **Docker**, **PostgreSQL 15**, **Node.js 18** e **PHP 8.1 / Apache**, preparado para executar o ecossistema **WebClinic ERP** (arquitetura Multi-Tenant com Laravel) tanto em ambientes **Ubuntu (Linux)** quanto em **Windows**.
 
-Este repositório contém a infraestrutura e o ambiente de desenvolvimento conteinerizado com **Docker**, **PostgreSQL**, **Node.js 18** e **PHP/Laravel**, preparado para rodar tanto em ambientes **Ubuntu (Linux)** quanto em **Windows**.
+> **Nota:** Este repositório gerencia a **infraestrutura de contêineres**. O código-fonte da aplicação Laravel reside no repositório [WebClinic](https://github.com/rogerionasc/WebClinic) e é clonado/montado no diretório `appWeb/`.
 
 ---
 
@@ -38,16 +39,16 @@ Este repositório contém a infraestrutura e o ambiente de desenvolvimento conte
 
 O ambiente é orquestrado via `docker-compose.yml` composto pelos seguintes serviços integrados na rede interna `network-webclinic`:
 
-| Serviço | Contêiner | Imagem / Base | Porta Exposta | Descrição |
+| Serviço | Contêiner | Imagem / Base | Portas Expostas | Descrição |
 | :--- | :--- | :--- | :--- | :--- |
-| **db** | `postgres` | `postgres:15` | `5432:5432` | Banco de dados relacional com persistência em `./db_data` |
-| **app** | `appWeb` | Build local (`./Dockerfile`) | `8000:8000` / `8080:80` | Aplicação PHP 8.1, Apache, Composer, Node.js 18 e Laravel |
+| **db** | `postgres` | `postgres:15` | `5432:5432` | Banco de dados PostgreSQL com persistência em `./db_data` |
+| **app** | `appWeb` | Build local (`./Dockerfile`) | `80:80` e `8080:80` | Servidor web Apache, PHP 8.1, Composer, Node.js 18 e aplicação Laravel |
 
 ---
 
 # Pré-requisitos
 
-Antes de iniciar, certifique-se de ter instalado em sua máquina (Ubuntu ou Windows):
+Antes de iniciar, certifique-se de ter instalado em sua máquina:
 
 - [Docker Engine](https://docs.docker.com/engine/install/) (v20.10 ou superior)
 - [Docker Compose](https://docs.docker.com/compose/install/) (v2.0 ou superior)
@@ -59,80 +60,102 @@ Antes de iniciar, certifique-se de ter instalado em sua máquina (Ubuntu ou Wind
 
 Siga o passo a passo abaixo para subir o ambiente do zero:
 
-### 1. Clonar o Repositório
+### 1. Clonar o Repositório de Infraestrutura
 ```bash
-git clone <url-do-repositorio>
+git clone https://github.com/rogerionasc/AmbienteDocker.git
 cd AmbienteDocker
 ```
 
 ### 2. Configurar Variáveis de Ambiente do Docker
-O arquivo `.env` na raiz define as credenciais do banco para o Docker Compose:
-```ini
-DATABASE_DATABASE=gesoft
-DATABASE_USER=user
-DATABASE_PASSWORD=user
-```
-
-### 3. Configurar o `.env` da Aplicação Laravel
-Dentro do diretório `appWeb`, copie o arquivo de exemplo para criar o seu `.env`:
+Copie o arquivo de exemplo para criar o `.env` raiz do Docker Compose:
 ```bash
-cp appWeb/.env.example appWeb/.env
+cp .env-example .env
 ```
 
-Verifique se a seção de banco de dados do `appWeb/.env` aponta para o contêiner do PostgreSQL:
+Edite o `.env` raiz com os dados desejados:
 ```ini
-DB_CONNECTION=pgsql
-DB_HOST=db
-DB_PORT=5432
-DB_DATABASE=gesoft
-DB_USERNAME=user
-DB_PASSWORD=user
+DATABASE_DATABASE=webclinic
+DATABASE_ROOT_PASSWORD=root
+DATABASE_USER=postgres
+DATABASE_PASSWORD=postgres
+
+# Token de acesso pessoal do GitHub para clonar o repositório WebClinic no primeiro boot:
+GITHUB_TOKEN=seu_token_aqui
 ```
 
-### 4. Configurar a Resolução de DNS Local (Hosts)
-Para acessar a aplicação utilizando domínios amigáveis como `http://appweb.local` ou `http://webclinic.local`:
+### 3. Configurar a Resolução de DNS Local (Hosts)
+A aplicação utiliza arquitetura multi-tenant com domínios locais (`webclinic.local`, `matriz.webclinic.local`).
+
+#### No Windows:
+Execute com o botão direito -> **Executar como Administrador** o arquivo:
+```cmd
+setup-hosts.bat
+```
 
 #### No Ubuntu / Linux:
-Execute o script utilitário incluído no projeto:
+Execute o script utilitário com permissão de execução:
 ```bash
 chmod +x setup-hosts.sh
 ./setup-hosts.sh
 ```
-*(O script adicionará `127.0.0.1 appweb.local webclinic.local` no `/etc/hosts` com `sudo`)*
 
-#### No Windows:
-Execute com duplo clique o arquivo **`setup-hosts.bat`** (ele solicitará permissão de Administrador e atualizará o arquivo `C:\Windows\System32\drivers\etc\hosts`).
+*(O script registrará `127.0.0.1 appweb.local webclinic.local matriz.webclinic.local` no seu arquivo `hosts`).*
 
 ---
 
 # Inicialização dos Contêineres
 
-### Subir o ambiente em segundo plano:
+### 1. Subir o ambiente em segundo plano:
 ```bash
 docker compose up -d --build
 ```
 
-### Verificar o status dos contêineres:
+No primeiro boot, o contêiner `appWeb` executará automaticamente o script de entrypoint que:
+1. Clona o repositório WebClinic para a pasta `appWeb/` (se ainda não existir).
+2. Cria o arquivo `.env` da aplicação a partir de `.env.example`.
+3. Executa `composer install`.
+4. Executa `npm install` e `npm run build`.
+5. Gera a chave da aplicação (`php artisan key:generate`).
+6. Cria o link simbólico de storage (`php artisan storage:link`).
+7. Ajusta permissões de escrita em `storage/` e `bootstrap/cache`.
+8. Inicia o servidor web Apache.
+
+### 2. Verificar o status dos contêineres:
 ```bash
 docker compose ps
 ```
 
-### Inicializar a Aplicação Laravel (Primeira Execução):
-Acesse o terminal do contêiner `appWeb` para gerar a chave da aplicação e rodar as migrações:
+---
 
-```bash
-# Entrar no contêiner da aplicação
-docker compose exec app bash
+# Configuração do Banco de Dados e Multi-Tenancy
 
-# Dentro do contêiner:
-php artisan key:generate
-php artisan migrate --seed
-
-# Instalar dependências de frontend e compilar assets com Node.js 18:
-npm install
-npm run build   # ou 'npm run dev' em modo desenvolvimento
-exit
+### 1. Configurar o `.env` da Aplicação (`appWeb/.env`)
+Certifique-se de que a conexão do banco aponta para o host do contêiner (`db`):
+```ini
+DB_CONNECTION=pgsql
+DB_HOST=db
+DB_PORT=5432
+DB_DATABASE=webclinic
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
 ```
+
+Se alterar o `.env`, limpe o cache de configuração no contêiner:
+```bash
+docker compose exec app php artisan config:clear
+```
+
+### 2. Executar as Migrações do Banco Central:
+```bash
+docker compose exec app php artisan migrate
+```
+
+### 3. Criar o Superusuário e o Primeiro Tenant (Matriz):
+Execute o comando interativo do WebClinic para criar a empresa/clínica matriz e o usuário administrador:
+```bash
+docker compose exec app php artisan create:su
+```
+*(O comando criará o tenant ID 1000, o domínio `matriz.webclinic.local` e migrará o banco de dados do tenant `clinica_webclinic`).*
 
 ---
 
@@ -142,9 +165,29 @@ Com os contêineres em execução, os serviços estão disponíveis em:
 
 | Serviço | URL | Descrição |
 | :--- | :--- | :--- |
-| **Laravel Server** | [http://appweb.local:8000](http://appweb.local:8000) ou `http://localhost:8000` | Servido via `php artisan serve` |
-| **Apache Web Server** | [http://appweb.local:8080](http://appweb.local:8080) ou `http://localhost:8080` | Servido via servidor web Apache |
-| **PostgreSQL** | `localhost:5432` (externo) / `db:5432` (interno) | Acesso via DBeaver, pgAdmin ou terminal |
+| **Central / Landing** | [http://webclinic.local](http://webclinic.local) | Domínio principal da plataforma |
+| **Tenant Matriz (Login)** | [http://matriz.webclinic.local](http://matriz.webclinic.local) | Acesso direto à clínica/tenant Matriz |
+| **Porta Alternativa Apache** | [http://matriz.webclinic.local:8080](http://matriz.webclinic.local:8080) | Mapeamento alternativo para porta 8080 |
+| **PostgreSQL** | `localhost:5432` (externo) / `db:5432` (interno) | Acesso via DBeaver, pgAdmin, HeidiSQL |
+
+---
+
+# Solução de Problemas Frequentes
+
+### 1. Conflito de porta 5432 com PostgreSQL do Laragon (Windows)
+* **Sintoma:** Erro `Connection refused` ou falha de autenticação ao conectar no PostgreSQL pela máquina hospedeira.
+* **Causa:** O Laragon possui um serviço `postgres.exe` próprio rodando em `127.0.0.1:5432`, interceptando a porta do Docker.
+* **Solução:** No painel do Laragon, clique com o botão direito -> **PostgreSQL -> Stop** (ou feche o Laragon enquanto usa o Docker).
+
+### 2. Erro `SQLSTATE[08006] Connection refused` no Tenant
+* **Causa:** O `DB_HOST` no arquivo `appWeb/.env` está definido como `localhost`. Dentro do contêiner, `localhost` não possui servidor PostgreSQL instalado.
+* **Solução:** Altere para `DB_HOST=db` no `appWeb/.env` e execute `docker compose exec app php artisan config:clear`.
+
+### 3. Link Simbólico do Storage
+Se as imagens e uploads não carregarem, recrie o link simbólico:
+```bash
+docker compose exec app php artisan storage:link
+```
 
 ---
 
@@ -152,7 +195,7 @@ Com os contêineres em execução, os serviços estão disponíveis em:
 
 ### Ver logs em tempo real:
 ```bash
-# Logs de todos os serviços
+# Logs de todos os contêineres
 docker compose logs -f
 
 # Logs apenas da aplicação
@@ -162,22 +205,22 @@ docker compose logs -f app
 docker compose logs -f db
 ```
 
+### Acessar o terminal do contêiner da aplicação:
+```bash
+docker compose exec app bash
+```
+
 ### Reiniciar serviços:
 ```bash
 docker compose restart
 ```
 
-### Parar o ambiente:
-```bash
-docker compose stop
-```
-
-### Destruir contêineres e manter dados salvos:
+### Parar e remover contêineres (mantendo dados do banco preservados em `./db_data`):
 ```bash
 docker compose down
 ```
 
-### Executar comandos Artisan diretamente:
+### Rodar comandos Artisan diretamente:
 ```bash
 docker compose exec app php artisan route:list
 docker compose exec app php artisan migrate:status
@@ -185,27 +228,25 @@ docker compose exec app php artisan migrate:status
 
 ---
 
-# Estrutura do Projeto
+# Estrutura do Repositório
 
 ```text
 AmbienteDocker/
-├── appWeb/                 # Código-fonte da aplicação Laravel
-│   ├── app/
-│   ├── config/
-│   ├── routes/
-│   └── .env.example
-├── db_data/                # Volume de dados persistentes do PostgreSQL
-├── .env                    # Variáveis de ambiente raiz (Docker Compose)
-├── docker-compose.yml      # Configuração dos serviços e contêineres
-├── Dockerfile              # Imagem Docker customizada da aplicação
+├── .dockerignore           # Exclusões de arquivos na geração da imagem Docker
+├── .env-example            # Exemplo de variáveis de ambiente do Docker Compose
+├── .gitignore              # Ignora .env, appWeb/ e db_data/ para manter repo limpo
+├── 000-default.conf        # Configuração do VirtualHost do Apache
+├── Dockerfile              # Imagem Docker customizada (Ubuntu 22.04 + PHP 8.1 + Node 18)
+├── docker-compose.yml      # Orquestração dos serviços (postgres e appWeb)
 ├── hosts                   # Mapeamentos de host para referência
-├── setup-hosts.sh          # Script de configuração de hosts para Ubuntu/Linux
-├── setup-hosts.bat         # Script de configuração de hosts para Windows
-└── README.md               # Documentação do projeto
+├── setup-hosts.bat         # Script automatizado de configuração de hosts para Windows
+├── setup-hosts.sh          # Script automatizado de configuração de hosts para Linux
+├── LICENSE                 # Termos de licença
+└── README.md               # Documentação completa do projeto
 ```
 
 ---
 
 # Licença
 
-Consulte o arquivo [LICENSE](file:///c:/laragon/www/AmbienteDocker/LICENSE) para obter detalhes sobre direitos autorais e termos de licença de uso do software.
+Consulte o arquivo [LICENSE](LICENSE) para obter detalhes sobre os direitos autorais e termos de licença de uso do software.

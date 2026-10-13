@@ -3,7 +3,7 @@
 # Script para configurar os domínios locais no /etc/hosts do Ubuntu / Linux
 # Uso: chmod +x setup-hosts.sh && ./setup-hosts.sh
 
-DOMAINS=("appweb.local" "webclinic.local")
+DOMAINS=("appweb.local" "webclinic.local" "matriz.webclinic.local")
 HOSTS_FILE="/etc/hosts"
 
 echo "=========================================================="
