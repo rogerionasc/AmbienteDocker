@@ -5,10 +5,10 @@
     <p>
         <img src="https://img.shields.io/badge/Docker-24.0+-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
         <img src="https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
-        <img src="https://img.shields.io/badge/PHP-8.1-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP" />
+        <img src="https://img.shields.io/badge/PHP-8.1--apache-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP 8.1 Apache" />
         <img src="https://img.shields.io/badge/Node.js-18.x-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js" />
         <img src="https://img.shields.io/badge/Laravel-9.x%20%2F%2010.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel" />
-        <img src="https://img.shields.io/badge/Ubuntu-22.04-E95420?style=for-the-badge&logo=ubuntu&logoColor=white" alt="Ubuntu" />
+        <img src="https://img.shields.io/badge/Debian-Slim-A81D33?style=for-the-badge&logo=debian&logoColor=white" alt="Debian" />
     </p>
 </div>
 
@@ -236,7 +236,7 @@ AmbienteDocker/
 ├── .env-example            # Exemplo de variáveis de ambiente do Docker Compose
 ├── .gitignore              # Ignora .env, appWeb/ e db_data/ para manter repo limpo
 ├── 000-default.conf        # Configuração do VirtualHost do Apache
-├── Dockerfile              # Imagem Docker customizada (Ubuntu 22.04 + PHP 8.1 + Node 18)
+├── Dockerfile              # Imagem Docker customizada (PHP 8.1 Apache + Node 18 + OPcache)
 ├── docker-compose.yml      # Orquestração dos serviços (postgres e appWeb)
 ├── hosts                   # Mapeamentos de host para referência
 ├── setup-hosts.bat         # Script automatizado de configuração de hosts para Windows

@@ -58,7 +58,7 @@ services:
         chown -R www-data:www-data /var/www/html/appWeb/storage /var/www/html/appWeb/bootstrap/cache &&
         chmod -R 777 /var/www/html/appWeb/storage /var/www/html/appWeb/bootstrap/cache &&
         echo '=== Iniciando Servidor Apache ===' &&
-        apache2ctl -D FOREGROUND
+        apache2-foreground
       "
     networks:
       - network-webclinic
