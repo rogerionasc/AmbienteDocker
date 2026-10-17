@@ -119,9 +119,10 @@ No primeiro boot, o contêiner `appWeb` executará automaticamente o script de e
 3. Executa `composer install`.
 4. Executa `npm install` e `npm run build`.
 5. Gera a chave da aplicação (`php artisan key:generate`).
-6. Cria o link simbólico de storage (`php artisan storage:link`).
-7. Ajusta permissões de escrita em `storage/` e `bootstrap/cache`.
-8. Inicia o servidor web Apache.
+6. Executa automaticamente as migrações do banco central (`php artisan migrate --force`).
+7. Cria o link simbólico de storage (`php artisan storage:link`).
+8. Ajusta permissões de escrita em `storage/` e `bootstrap/cache`.
+9. Inicia o servidor web Apache.
 
 ### 2. Verificar o status dos contêineres:
 ```bash
