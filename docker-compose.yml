@@ -33,6 +33,7 @@ services:
       bash -c "
         if [ ! -f /var/www/html/appWeb/artisan ]; then
           echo '=== Clonando repositorio WebClinic ===' &&
+          find /var/www/html/appWeb -mindepth 1 -delete 2>/dev/null || true &&
           if [ -n \"$$GITHUB_TOKEN\" ] && [ \"$$GITHUB_TOKEN\" != \"seu_token_aqui\" ]; then
             git clone https://$${GITHUB_TOKEN}@github.com/rogerionasc/WebClinic.git /var/www/html/appWeb;
           else
@@ -54,6 +55,7 @@ services:
         echo '=== Criando link simbolico do storage ===' &&
         php artisan storage:link || true &&
         echo '=== Configurando permissoes de storage e logs ===' &&
+        mkdir -p /var/www/html/appWeb/storage/logs /var/www/html/appWeb/bootstrap/cache &&
         touch /var/www/html/appWeb/storage/logs/laravel.log &&
         chown -R www-data:www-data /var/www/html/appWeb/storage /var/www/html/appWeb/bootstrap/cache &&
         chmod -R 777 /var/www/html/appWeb/storage /var/www/html/appWeb/bootstrap/cache &&
