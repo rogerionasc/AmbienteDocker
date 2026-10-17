@@ -19,8 +19,8 @@ services:
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     tty: true
-      
-  app:
+
+  appWeb:
     container_name: appWeb
     build:
       context: .
