@@ -75,7 +75,6 @@ cp .env-example .env
 Edite o `.env` raiz com os dados desejados:
 ```ini
 DATABASE_DATABASE=webclinic
-DATABASE_ROOT_PASSWORD=root
 DATABASE_USER=postgres
 DATABASE_PASSWORD=postgres
 
