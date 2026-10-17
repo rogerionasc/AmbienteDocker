@@ -74,6 +74,10 @@ cp .env-example .env
 
 Edite o `.env` raiz com os dados desejados:
 ```ini
+# Configurações do Banco de Dados
+DATABASE_CONNECTION=pgsql
+DATABASE_HOST=db
+DATABASE_PORT=5432
 DATABASE_DATABASE=webclinic
 DATABASE_USER=postgres
 DATABASE_PASSWORD=postgres

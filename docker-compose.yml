@@ -28,7 +28,12 @@ services:
     restart: unless-stopped
     environment:
       GITHUB_TOKEN: ${GITHUB_TOKEN}
-      DB_HOST: db
+      DB_CONNECTION: ${DATABASE_CONNECTION:-pgsql}
+      DB_HOST: ${DATABASE_HOST:-db}
+      DB_PORT: ${DATABASE_PORT:-5432}
+      DB_DATABASE: ${DATABASE_DATABASE}
+      DB_USERNAME: ${DATABASE_USER}
+      DB_PASSWORD: ${DATABASE_PASSWORD}
     entrypoint: >
       bash -c "
         if [ ! -f /var/www/html/appWeb/artisan ]; then
@@ -42,10 +47,19 @@ services:
         fi &&
         cd /var/www/html/appWeb &&
         if [ ! -f .env ]; then cp .env.example .env; fi &&
+        echo '=== Sincronizando variaveis de banco no appWeb/.env ===' &&
+        set_env() { if grep -q \"^$$1=\" .env; then sed -i \"s|^$$1=.*|$$1=$$2|\" .env; else echo \"$$1=$$2\" >> .env; fi; };
+        set_env DB_CONNECTION \"$$DB_CONNECTION\" &&
+        set_env DB_HOST \"$$DB_HOST\" &&
+        set_env DB_PORT \"$$DB_PORT\" &&
+        set_env DB_DATABASE \"$$DB_DATABASE\" &&
+        set_env DB_USERNAME \"$$DB_USERNAME\" &&
+        set_env DB_PASSWORD \"$$DB_PASSWORD\" &&
         if [ ! -f vendor/autoload.php ]; then
           echo '=== Instalando dependencias do Composer ===' &&
           composer install --no-interaction --prefer-dist --optimize-autoloader;
         fi &&
+        php artisan config:clear || true &&
         if [ ! -f public/build/manifest.json ]; then
           echo '=== Compilando assets do Vite com Node ===' &&
           npm install &&
