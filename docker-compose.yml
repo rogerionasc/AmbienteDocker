@@ -20,7 +20,7 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     tty: true
 
-  appWeb:
+  appweb:
     container_name: appWeb
     build:
       context: .
