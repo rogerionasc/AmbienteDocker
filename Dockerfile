@@ -28,6 +28,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         intl \
         opcache \
     && a2enmod rewrite \
+    && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 2. Node.js 18 para compilação de assets do Vite / frontend
