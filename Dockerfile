@@ -43,7 +43,8 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY ./000-default.conf /etc/apache2/sites-available/000-default.conf
 
 # 5. Otimizações de configuração do PHP e OPcache para Laravel
-RUN { \
+RUN rm -f /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini && { \
+    echo 'zend_extension=opcache'; \
     echo 'opcache.enable=1'; \
     echo 'opcache.memory_consumption=128'; \
     echo 'opcache.interned_strings_buffer=8'; \
