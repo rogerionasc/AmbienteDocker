@@ -70,6 +70,8 @@ services:
         for i in $$(seq 1 30); do
           php artisan migrate --force && break || { echo 'Aguardando banco de dados inicializar...'; sleep 2; };
         done &&
+        echo '=== Executando migracoes dos bancos dos tenants ===' &&
+        php artisan tenants:migrate --force || true &&
         echo '=== Criando link simbolico do storage ===' &&
         php artisan storage:link || true &&
         echo '=== Configurando permissoes de storage e logs ===' &&
